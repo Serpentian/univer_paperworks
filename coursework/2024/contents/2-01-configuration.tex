@@ -1,0 +1,259 @@
+\section{Настройка}
+
+\subsection{Установка пакетов}
+
+Для настройки точечной маршрутизации по доменам на OpenWrt требуется установка пакета dnsmasq-full, так как по умолчанию в прошивке используется урезанная версия dnsmasq для экономии места. Dnsmasq — это ключевой компонент системы, отвечающий за DNS-обслуживание, и его удаление может нарушить работу маршрутизатора. Поэтому перед установкой нового пакета необходимо выполнить несколько подготовительных шагов.
+
+Процесс установки dnsmasq-full выглядит следующим образом \cite{openwrt}:
+
+\begin{enumerate}
+    \item Обновление индекса пакетов и скачивание dnsmasq-full. Для начала нужно обновить список доступных пакетов и выгрузить пакет dnsmasq-full в директорию /tmp:
+
+\begin{lstlisting}[frame=rlbt]
+opkg update && cd /tmp/ && opkg download dnsmasq-full
+\end{lstlisting}
+
+    \item Удаление стандартного dnsmasq. Поскольку стандартный dnsmasq не поддерживает необходимые функции, его нужно удалить перед установкой полной версии:
+
+\begin{lstlisting}[frame=rlbt]
+opkg remove dnsmasq
+\end{lstlisting}
+
+    \item Установка dnsmasq-full. Новый пакет устанавливается из кэша в директории /tmp. При этом важно сохранить текущие настройки DHCP, если они необходимы. Если файл /etc/config/dhcp имеет пользовательские изменения, стоит перенести конфигурацию вручную:
+
+\begin{lstlisting}[frame=rlbt]
+opkg install dnsmasq-full --cache /tmp/
+mv /etc/config/dhcp-opkg /etc/config/dhcp
+\end{lstlisting}
+
+    \item Установка curl. Для работы со скриптами обновления списков доменов и проверки подключения потребуется установка утилиты curl:
+
+\begin{lstlisting}[frame=rlbt]
+    opkg install curl
+\end{lstlisting}
+
+\end{enumerate}
+
+Эти шаги обеспечивают установку всех необходимых инструментов для реализации точечной маршрутизации по доменам на маршрутизаторе с OpenWrt
+
+\subsection{Настройка маршрутизации}
+
+Для управления трафиком и перенаправления его через VPN-туннель необходимо настроить специальную таблицу маршрутизации и правила для маркировки пакетов. Все пакеты с заданной маркировкой будут направляться в отдельную таблицу маршрутизации, которая перенаправляет трафик в туннель.
+
+Добавляется новая таблица маршрутизации с уникальным идентификатором \cite{openwrt}:
+
+\begin{lstlisting}[frame=rlbt]
+echo '99 vpn' >> /etc/iproute2/rt_tables
+\end{lstlisting}
+
+Для указания, что весь трафик с определённой маркировкой должен использовать таблицу vpn, настраивается правило. Это можно выполнить через UCI или напрямую в конфигурационных файлах (/etc/config/network).
+
+\begin{lstlisting}[frame=rlbt]
+uci add network rule
+uci set network.@rule[-1].name='mark0x1'
+uci set network.@rule[-1].mark='0x1'
+uci set network.@rule[-1].priority='100'
+uci set network.@rule[-1].lookup='vpn'
+uci commit network
+\end{lstlisting}
+
+Добавляется правило, направляющее весь трафик таблицы маршрутизации в туннель. В случае с WireGuard и интерфейсом wg0 выполняется следующая настройка.
+
+\begin{lstlisting}[frame=rlbt]
+uci set network.vpn_route=route
+uci set network.vpn_route.interface='wg0'
+uci set network.vpn_route.table='vpn'
+uci set network.vpn_route.target='0.0.0.0/0'
+uci commit network
+\end{lstlisting}
+
+Для туннелей, таких как OpenVPN, Sing-box, tun2socks, создающих интерфейсы типа device (например, tun0), настройка через UCI не поддерживается. В этом случае применяется hotplug. Создаётся файл /etc/hotplug.d/iface/30-vpnroute со следующим содержимым:
+
+\begin{lstlisting}[frame=rlbt,language=bash]
+#!/bin/sh
+
+sleep 10
+ip route add table vpn default dev tun0
+\end{lstlisting}
+
+\subsection{Настройка firewall}
+
+Для обеспечения прохождения трафика через туннель требуется создать зону в файерволе, настроить nftables set для IP-адресов доменов, а также правило, которое будет маркировать трафик к этим адресам.
+
+Зона для туннеля настраивается для обеспечения корректного прохождения трафика через него. Настройка зоны может варьироваться в зависимости от используемого туннеля (WireGuard, OpenVPN и т.д.) и описана в соответствующей документации для конкретного типа туннеля. Обычно создаётся зона с интерфейсом туннеля, например, wg0 или tun0, и задаются необходимые правила для передачи трафика между зонами.
+
+Создаётся список vpn\_domains, в который будут автоматически добавляться IP-адреса доменов для точечной маршрутизации. Настройка через UCI выглядит следующим образом:
+
+\begin{lstlisting}[frame=rlbt]
+uci add firewall ipset
+uci set firewall.@ipset[-1].name='vpn_domains'
+uci set firewall.@ipset[-1].match='dst_net'
+uci commit firewall
+\end{lstlisting}
+
+Для маркировки трафика, идущего к IP-адресам из списка vpn\_domains, создаётся правило:
+
+\begin{lstlisting}[frame=rlbt]
+uci add firewall rule
+uci set firewall.@rule[-1]=rule
+uci set firewall.@rule[-1].name='mark_domains'
+uci set firewall.@rule[-1].src='lan'
+uci set firewall.@rule[-1].dest='*'
+uci set firewall.@rule[-1].proto='all'
+uci set firewall.@rule[-1].ipset='vpn_domains'
+uci set firewall.@rule[-1].set_mark='0x1'
+uci set firewall.@rule[-1].target='MARK'
+uci set firewall.@rule[-1].family='ipv4'
+uci commit firewall
+\end{lstlisting}
+
+\subsection{Настройка автоматического обновления списка доменов}
+
+Чтобы автоматически обновлять список доменов, которые необходимо перенаправлять
+в тунель быд написан скрипт, включающий следующие функции:
+
+\begin{itemize}
+    \item Проверка доступности интернета после загрузки роутера.
+    \item Загрузка готового конфигурационного файла в /tmp/dnsmasq.d/.
+    \item Проверка валидности загруженного файла.
+    \item Перезапуск службы dnsmasq при наличии корректной конфигурации.
+\end{itemize}
+
+Для обработки доменов и их резолвинга в списки IP-адресов используется конфигурация для dnsmasq. Она помещается в /tmp/dnsmasq.d/ — директорию для временных конфигураций. Пример конфигурации:
+
+\begin{lstlisting}[frame=rlbt]
+nftset=/graylog.org/4#inet#fw4#vpn_domains
+nftset=/terraform.io/4#inet#fw4#vpn_domains
+\end{lstlisting}
+
+Каждая строка добавляет домен (включая субдомены) в список vpn\_domains. Таким образом, IP-адреса доменов автоматически помещаются в таблицу маршрутизации.
+
+Скрипт обновления списка доменов (/etc/init.d/getdomains):
+
+\begin{lstlisting}[frame=rlbt,language=bash]
+#!/bin/sh /etc/rc.common
+
+START=99
+
+start () {
+    DOMAINS=https://raw.githubusercontent.com/itdoginfo/allow-domains/main/Russia/inside-dnsmasq-nfset.lst
+
+    count=0
+    while true; do
+        if curl -m 3 github.com; then
+            curl -f $DOMAINS --output /tmp/dnsmasq.d/domains.lst
+            break
+        else
+            echo "GitHub is not available. Check the internet availability [$count]"
+            count=$((count+1))
+        fi
+    done
+
+    if dnsmasq --conf-file=/tmp/dnsmasq.d/domains.lst --test 2>&1 | grep -q "syntax check OK"; then
+        /etc/init.d/dnsmasq restart
+    fi
+}
+\end{lstlisting}
+
+Скрипт необходимо сделать исполняемым и добавить в автозагрузку:
+
+\begin{lstlisting}[frame=rlbt]
+chmod +x /etc/init.d/getdomains
+ln -sf ../init.d/getdomains /etc/rc.d/S99getdomains
+\end{lstlisting}
+
+Для регулярного обновления конфигурации используется cron. Добавляется задание на обновление списка каждые 8 часов \cite{cron}. В файл crontab добавляется строка:
+
+\begin{lstlisting}[frame=rlbt]
+0 */8 * * * /etc/init.d/getdomains start
+\end{lstlisting}
+
+После настройки выполняется перезапуск сети и ручной запуск скрипта:
+
+\begin{lstlisting}[frame=rlbt]
+service network restart
+service getdomains start
+\end{lstlisting}
+
+Преимущества подхода:
+
+\begin{itemize}
+    \item Ускорение работы: Готовые конфигурации избавляют от необходимости конвертировать списки вручную.
+    \item Удобство обновления: Скрипт автоматически загружает и проверяет новые списки.
+    \item Автоматизация: Настройка автозапуска и периодического обновления обеспечивает бесперебойную работу маршрутизации.
+\end{itemize}
+
+\subsection{Добавление доменов в обход скрипта}
+
+Для добавления необходимых доменов в список vpn\_domains через конфигурацию dnsmasq требуется изменить файл /etc/config/dhcp. В конце файла добавляется следующий блок:
+
+\begin{lstlisting}[frame=rlbt]
+config ipset
+        list name 'vpn_domains'
+        list domain 'graylog.org'
+        list domain 'terraform.io'
+\end{lstlisting}
+
+Каждый домен добавляется новой строкой с ключевым словом list domain. Поскольку dnsmasq поддерживает wildcard, добавлять субдомены отдельно не требуется — они автоматически обрабатываются. После внесения изменений для применения настроек необходимо перезапустить dnsmasq:
+
+\begin{lstlisting}[frame=rlbt]
+service dnsmasq restart
+\end{lstlisting}
+
+\subsection{Возможные проблемы}
+
+В случае точечной маршрутизации через домены на роутере с OpenWrt могут возникнуть проблемы, если провайдер вмешивается в DNS-запросы или блокирует трафик, что нарушает корректную работу маршрутизации. Существуют несколько возможных ситуаций:
+
+\begin{enumerate}
+    \item Подмена IP-адресов на DNS-серверах провайдера. В этом случае достаточно просто сменить DNS-сервер на роутере (например, на 8.8.8.8 или 8.8.4.4), чтобы обойти эту подмену.
+
+    \item Провайдер подменяет запросы на своих DNS-серверах, даже если использовать другие DNS-серверы (например, 8.8.8.8), оборудование провайдера может перехватывать и изменять DNS-запросы. Для решения этой проблемы можно настроить DNS over TLS или DNS over HTTPS.
+
+    \item Провайдер блокирует весь трафик на порту 53, кроме запросов к своим DNS-серверам. В этой ситуации необходимо использовать зашифрованные каналы для DNS-запросов, такие как DNS over TLS или DNS over HTTPS.
+\end{enumerate}
+
+Для обхода блокировки DNS-запросов можно установить один из двух популярных резолверов, поддерживающих шифрование: DNSCrypt-proxy2 или Stubby. Если на роутере ограниченное количество памяти, например, 16 МБ, лучше выбрать Stubby из-за его меньшего размера. В остальных случаях можно использовать DNSCrypt для более широких возможностей.
+
+\subsubsection*{DNSCrypt-proxy2}
+
+DNSCrypt-proxy2 позволяет шифровать DNS-запросы через DNS over TLS или DNS over HTTPS. Этот инструмент требует больше места на роутере (около 10.7 МБ), но предоставляет расширенные функции \cite{dnscrypt}.
+
+\begin{lstlisting}[frame=rlbt]
+opkg update && opkg install dnscrypt-proxy2
+\end{lstlisting}
+
+Конфигурация изменяется в файле /etc/dnscrypt-proxy2/dnscrypt-proxy.toml, где можно выбрать серверы в параметре server\_names. После этого нужно перезапустить сервис:
+
+\begin{lstlisting}[frame=rlbt]
+service dnscrypt-proxy restart
+\end{lstlisting}
+
+Далее настраиваем dnsmasq, чтобы он использовал DNSCrypt как сервер:
+
+\begin{lstlisting}[frame=rlbt]
+uci set dhcp.@dnsmasq[0].noresolv="1"
+uci -q delete dhcp.@dnsmasq[0].server
+uci add_list dhcp.@dnsmasq[0].server="127.0.0.53#53"
+uci commit dhcp
+service dnsmasq restart
+\end{lstlisting}
+
+Теперь все DNS-запросы будут шифроваться через DNSCrypt.
+
+\subsubsection*{Stubby}
+
+Stubby — это более легковесная альтернатива DNSCrypt, занимающая всего 36K + библиотеки. Он использует DNS over TLS и по умолчанию настроен на сервера Cloudflare.
+
+\begin{lstlisting}[frame=rlbt]
+opkg update && opkg install stubby
+\end{lstlisting}
+
+Конфигурация по умолчанию использует 127.0.0.1:5453, но можно настроить другие серверы в /etc/config/stubby. Для настройки dnsmasq нужно изменить сервер на 127.0.0.1\#5453:
+
+\begin{lstlisting}[frame=rlbt]
+uci set dhcp.@dnsmasq[0].noresolv="1"
+uci -q delete dhcp.@dnsmasq[0].server
+uci add_list dhcp.@dnsmasq[0].server="127.0.0.1#5453"
+uci commit dhcp
+service dnsmasq restart
+\end{lstlisting}

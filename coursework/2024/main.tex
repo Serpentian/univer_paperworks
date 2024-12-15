@@ -1,0 +1,57 @@
+\documentclass[diploma]{BMSTU-IU8}
+
+\usepackage{todonotes}
+\usepackage{lipsum}
+\SetLipsumText{fishes}
+
+\student{И. И. Иванов}
+\theme{Создание отчёта \\ по НИРС \\ или ВКР}
+\group{ИУ8-999}
+
+\supervisor{П. П. Петров}
+\researchConsultant{П. П. Петров}
+\designConsultant{П. П. Петров}
+\technologicalConsultant{П. П. Петров}
+\economicsConsultant{П. П. Петров}
+\lawsConsultant{П. П. Петров}
+\normController{П. П. Петров}
+
+% \theme{Тест \hfill} % Тема для НИРСа заполняется по-другому
+\studentFullName{Иванов Иван Иванович}
+\profile{10У101}
+\speciality{10.05.01 <<Компьютерная безопасность>>}
+\specialization{10.05.01\_01 <<Математические методы защиты информации>>}
+\supervisorWithDegree{доцент, к.т.н. Иванов И. И.}
+
+\include{contents/glossary}
+\include{contents/terms}
+
+\addbibresource{main.bib}
+
+\begin{document}
+    % \maketitle
+    % % \inlineimg{example.png}{\img}
+    % \maketitle % Титульный лист
+
+    % % \includepdf[pages=-]{extra/task} % Задание
+    \setcounter{page}{4} % Устанавливает счётчик страниц
+
+    \include{contents/0-abstract} % Реферат
+
+    \tableofcontents % Содержание
+    % \termsanddefenitions % Термины и определения
+    % \listofabbreviations % Перечень сокращений и обозначений
+
+    \include{contents/1-introduction} % Введение
+
+    \include{contents/2-00-routing}
+    \include{contents/2-01-configuration}
+    \include{contents/2-02-script}
+
+    \include{contents/3-conclusion}
+
+    \printbibliography
+
+    \appendix
+    \include{contents/4-appendix-a}
+\end{document}

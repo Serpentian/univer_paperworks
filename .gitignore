@@ -1,6 +1,7 @@
 *.acn
 *.aux
 *.bbl
+*.bcf
 *.blg
 *.dvi
 *.glo*
@@ -9,3 +10,4 @@
 *.run.xml
 *.toc
 *.xdy
+*.ltd.tex
