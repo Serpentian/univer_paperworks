@@ -1,0 +1,11 @@
+*.acn
+*.aux
+*.bbl
+*.blg
+*.dvi
+*.glo*
+*.log
+*.out.ps
+*.run.xml
+*.toc
+*.xdy
