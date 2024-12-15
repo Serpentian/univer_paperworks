@@ -13,11 +13,14 @@
     \item В случае обрыва подключения, реплика посылает VCLOCK, полученный в пункте б, и LSN, до которого она успела получить данные.
 \end{enumerate}
 
-Так как vclock и данные с LSN уже посылались и до этого, именяется только IPROTO\_FETCH\_SNAPSHOT, приведенный в листинге 1.
+Так как vclock и данные с LSN уже посылались и до этого, именяется только IPROTO\_FETCH\_SNAPSHOT, приведенный на рисунке ~\ref{fig:fig04}.
 
-\listing[
-    caption={Изменения в запросе IPROTO\_FETCH\_SNAPSOT}
-]{inc/fetch_snapshot_file_join.yaml}
+\begin{figure}
+  \centering
+  \includegraphics[scale=2.00]{inc/listing.png}
+  \caption{Изменения в запросе IPROTO\_FETCH\_SNAPSOT}
+  \label{fig:fig04}
+\end{figure}
 
 Добавляется новое поле в тело запроса: IPROTO\_CURSOR, представляющее собой таблицу с полями VCLOCK и LSN. Она указывает, откуда необходимо продолжить скачивание файла. Она может иметь следующие значения:
 
