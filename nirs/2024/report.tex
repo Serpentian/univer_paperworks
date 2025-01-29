@@ -1,8 +1,7 @@
 \documentclass[research]{BMSTU-IU8}
 
-\usepackage{todonotes}
-\usepackage{lipsum}
-\SetLipsumText{fishes}
+\usepackage{amssymb} % triangleeq
+\usepackage{pdfpages}
 
 \student{Железцов Н.В.}
 \theme{Анализ и формальная верификация алгоритма консенсуса Raft}
@@ -19,12 +18,12 @@
 \include{contents/glossary}
 \include{contents/terms}
 
-\addbibresource{main.bib}
+\addbibresource{report.bib}
 
 \begin{document}
-    \maketitle % Титульный лист
+    % \maketitle % Титульный лист
 
-    % % \includepdf[pages=-]{extra/task} % Задание
+    \includepdf[pages=-]{inc/titul.pdf} % Задание
     \setcounter{page}{4} % Устанавливает счётчик страниц
 
     \include{contents/0-abstract} % Реферат
