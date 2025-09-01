@@ -1,0 +1,16 @@
+# <size>
+msgpack({MP_UINT = size(<header>) + size(<body>)})
+
+# <header>
+msgpack({
+    IPROTO_REQUEST_TYPE: IPROTO_FETCH_SNAPSHOT,
+    IPROTO_SYNC: MP_UINT
+})
+
+# <body>
+msgpack({
+    # This one is added:
+    (optional) IPROTO_CURSOR: MP_MAP
+        VCLOCK: MP_MAP,
+        LSN: MP_UINT,
+})
