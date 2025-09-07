@@ -1,5 +1,7 @@
 \documentclass[diploma]{BMSTU-IU8}
 
+\usepackage{pdfpages}
+
 \student{И. И. Иванов}
 \theme{Создание отчёта \\ по НИРС \\ или ВКР}
 \group{ИУ8-999}
@@ -19,19 +21,20 @@
 \specialization{10.05.01\_01 <<Математические методы защиты информации>>}
 \supervisorWithDegree{доцент, к.т.н. Иванов И. И.}
 
-% \include{contents/glossary}
+\include{contents/glossary}
 \include{contents/terms}
 \addbibresource{main.bib}
 
 \begin{document}
     % \maketitle
+    \includepdf[pages=-]{inc/titul.pdf} % Титульный лист.
     \setcounter{page}{3} % Устанавливает счётчик страниц
 
     \include{contents/0-abstract} % Реферат
 
+    \listofabbreviations % Перечень сокращений и обозначений
     \tableofcontents % Содержание
     \termsanddefenitions % Термины и определения
-    % \listofabbreviations % Перечень сокращений и обозначений
 
     \include{contents/1-introduction} % Введение
 
