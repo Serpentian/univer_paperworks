@@ -1,0 +1,16 @@
+\subsection{Серверный модуль}
+
+Серверный модуль инкапсулирует gRPC-сервер, принимающий запросы от:
+\begin{itemize}
+    \item других узлов (сервис \textbf{RaftService}: \texttt{RequestVote()}, 
+    \texttt{AppendEntries()}, \texttt{InstallSnapshot()});
+    \item клиентов (сервис \textbf{UserService}: \texttt{SubmitTask()}, 
+    \texttt{GetTask()}, \texttt{WatchTask()});
+    \item вычислительных узлов (сервис \textbf{WorkerService}: 
+    \texttt{StartTask()}, \texttt{ReportProgress()}, \texttt{CompleteTask()}).
+\end{itemize}
+
+Сервер маршрутизирует запросы: приём запросов на запись выполняется 
+любым узлом, но при отсутствии лидерства происходит редирект клиента 
+на лидера. Запросы чтения обслуживаются только после подтверждения 
+read-index, что гарантирует линейризуемость.

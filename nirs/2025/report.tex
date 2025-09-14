@@ -1,0 +1,50 @@
+\documentclass[research]{BMSTU-IU8}
+
+\usepackage{amssymb} % triangleeq
+\usepackage{pdfpages}
+
+\student{Железцов Н.В.}
+\theme{
+    Разработка отказоустойчивой системы распределенных вычислений с
+    использованием алгоритма консенсуса Raft
+}
+\group{ИУ8-104}
+
+\supervisor{Колесников А.В.}
+
+% \theme{Тест \hfill} % Тема для НИРСа заполняется по-другому
+\studentFullName{Железцов Никита Владимирович}
+\profile{20У474}
+\speciality{10.05.01 <<Компьютерная безопасность>>}
+\specialization{10.05.01\_01 <<Математические методы защиты информации>>}
+
+\include{contents/glossary}
+\include{contents/terms}
+
+\addbibresource{report.bib}
+
+\begin{document}
+    % \maketitle % Титульный лист
+
+    \includepdf[pages=-]{inc/titul.pdf} % Задание
+    \setcounter{page}{4} % Устанавливает счётчик страниц
+
+    \include{contents/0-abstract} % Реферат
+
+    \tableofcontents % Содержание
+    % \termsanddefenitions % Термины и определения
+    % \listofabbreviations % Перечень сокращений и обозначений
+
+    \include{contents/1-introduction} % Введение
+
+    \include{contents/2-00-analysys-of-the-subject}
+    \include{contents/2-01-raft.tex}
+
+    \include{contents/3-conclusion}
+
+    \printbibliography
+
+    \appendix
+    \include{contents/4-appendix-a}
+    \include{contents/4-appendix-b}
+\end{document}
