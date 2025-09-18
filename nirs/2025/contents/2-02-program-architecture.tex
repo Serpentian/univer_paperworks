@@ -1,8 +1,8 @@
 \section{Проектирование архитектуры системы}
 
-\subsection{Общая архитектура системы распределённых вычислений}
+\subsection{Общая архитектура системы}
 
-\subsubsection{Роли узлов и разграничение плоскостей}
+\subsubsection{Роли узлов}
 
 На верхнем уровне архитектуры выделяются два класса узлов: \emph{узлы
 консенсуса (Raft-узлы)} и \emph{вычислительные узлы (workers)}. Такое
@@ -61,8 +61,7 @@ manager), который назначает задания конкретным 
     нарушения согласованности.
 \end{itemize}
 
-\subsubsection{Обоснование отсутствия прямых связей «клиент$\rightarrow$воркер» и
-«воркер$\leftrightarrow$воркер»}
+\subsubsection{Обоснование отсутствия прямых связей между клиентом и рабочим узлом}
 
 Исключение прямого клиентского трафика на воркеры и запрет горизонтальных
 коммуникаций между воркерами снижает сложность системы и радиус отказа:
@@ -140,7 +139,7 @@ manager), который назначает задания конкретным 
 
 \begin{figure}
   \centering
-  \includegraphics[scale=0.4]{inc/raft-arch.png}
+  \includegraphics[scale=0.35]{inc/raft-arch.png}
   \caption{Архитектура Raft узла}
   \label{fig:arch-overview}
 \end{figure}
@@ -238,7 +237,7 @@ manager), который назначает задания конкретным 
 
 \begin{figure}
   \centering
-  \includegraphics[scale=0.4]{inc/client-arch.png}
+  \includegraphics[scale=0.25]{inc/client-arch.png}
   \caption{Взаимодействие клиента с кластером}
   \label{fig:client-arch}
 \end{figure}
@@ -316,7 +315,7 @@ manager), который назначает задания конкретным 
 
 \begin{figure}
   \centering
-  \includegraphics[scale=0.4]{inc/worker-arch.png}
+  \includegraphics[scale=0.25]{inc/worker-arch.png}
   \caption{Взаимодействие вычислительного узла с кластером}
   \label{fig:client-arch}
 \end{figure}

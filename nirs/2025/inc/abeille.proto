@@ -1,0 +1,179 @@
+syntax = "proto3";
+
+// ----------------------------- Common ----------------------------- //
+
+message TaskID {
+  string filename = 1;
+  uint64 client_id = 2;
+}
+
+message TaskState {
+  TaskID task_id = 1;
+  bytes task_result = 2;
+}
+
+// ----------------------------- Raft Entry ----------------------------- //
+
+message TaskWrapper {
+  TaskID task_id = 1;
+  uint64 worker_id = 2;
+  bytes task_data = 3;
+  bytes task_result = 4;
+  bytes lib = 5;
+}
+
+enum TaskStatus {
+  TASK_STATUS_ASSIGNED = 0;
+  TASK_STATUS_COMPLETED = 1;
+}
+
+message AddRequest { TaskStatus to = 1; }
+
+message MoveRequest {
+  TaskStatus to = 1;
+  TaskStatus from = 2;
+}
+
+enum RaftCommand {
+  RAFT_COMMAND_ADD = 0;
+  RAFT_COMMAND_MOVE = 1;
+}
+
+// Log entry to store
+message Entry {
+  RaftCommand command = 1;
+  uint64 term = 2;
+  TaskWrapper task_wrapper = 3;
+  AddRequest add_request = 4;
+  MoveRequest move_request = 5;
+}
+
+// ----------------------------- Raft Service ----------------------------- //
+
+// Main raft servers service
+service RaftService {
+  rpc AppendEntry(AppendEntryRequest) returns (AppendEntryResponse) {}
+  rpc RequestVote(RequestVoteRequest) returns (RequestVoteResponse) {}
+  rpc InstallSnapshot(InstallSnapshotRequest)
+                                      returns (InstallSnapshotResponse) {}
+}
+
+// Invoked by leader to replicate log entries
+// Also used as heartbeat
+message AppendEntryRequest {
+  uint64 term = 1;           // leader's term
+  uint64 leader_id = 2;      // so follower can redirect clients
+  uint64 prev_log_index = 3; // index of log entry preceding new ones
+  uint64 prev_log_term = 4;  // term of prev_log_index
+  Entry entry = 5;           // log entry to store (empty for heartbeat)
+  uint64 leader_commit = 6;  // leader's commit index
+}
+
+message AppendEntryResponse {
+  uint64 term = 1;           // current term for leader to update itself
+  bool success = 2;          // true if follower contained entry
+                             // matching prev_log_index and prev_log_term
+}
+
+message RequestVoteRequest {
+  uint64 term = 1;           // candidate's term
+  uint64 candidate_id = 2;   // candidate requesting vote
+  uint64 last_log_entry = 3; // index of candidate's log entry
+  uint64 last_log_term = 4;  // term of candidate's log entry
+}
+
+message RequestVoteResponse {
+  uint64 term = 1;           // current term for candidate to update itself
+  bool vote_granted = 2;     // true if candidate recieved vote
+}
+
+message InstallSnapshotRequest {
+  uint64 term = 1;
+  uint64 leader_id = 2;
+  uint64 last_index = 3;
+  uint64 last_term = 4;
+  Snapshot snapshot = 5;
+}
+
+message InstallSnapshotResponse {
+  uint64 term = 1;
+  bool success = 2;
+}
+
+// ----------------------------- User Service ----------------------------- //
+
+enum UserStatus {
+  USER_STATUS_DOWN = 0;
+  USER_STATUS_IDLE = 1;
+  USER_STATUS_UPLOAD_DATA = 2;
+}
+
+message UserConnectRequest {
+  UserStatus status = 1;
+  bytes task_data = 2;
+  string filename = 3;
+  bytes lib = 4;
+}
+
+enum UserCommand {
+  USER_COMMAND_NONE = 0;
+  USER_COMMAND_REDIRECT = 1;
+  USER_COMMAND_ASSIGN = 2;
+  USER_COMMAND_RESULT = 3;
+}
+
+message UserConnectResponse {
+  UserCommand command = 1;
+  uint64 leader_id = 2;
+  TaskState task_state = 3;
+}
+
+service UserService {
+  rpc Connect(stream UserConnectRequest) returns (stream UserConnectResponse) {}
+}
+
+// ----------------------------- Worker Service ----------------------------- //
+
+enum WorkerStatus {
+  WORKER_STATUS_DOWN = 0;
+  WORKER_STATUS_IDLE = 1;
+  WORKER_STATUS_BUSY = 2;
+  WORKER_STATUS_COMPLETED = 3;
+}
+
+message WorkerConnectRequest {
+  WorkerStatus status = 1;
+  TaskState task_state = 2;
+}
+
+enum WorkerCommand {
+  WORKER_COMMAND_NONE = 0;
+  WORKER_COMMAND_ASSIGN = 1;
+  WORKER_COMMAND_PROCESS = 2;
+  WORKER_COMMAND_REDIRECT = 3;
+}
+
+message WorkerConnectResponse {
+  WorkerCommand command = 1;
+  uint64 leader_id = 2;
+  TaskID task_id = 3;
+  bytes task_data = 4;
+  bytes lib = 5;
+}
+
+service WorkerService {
+  rpc Connect(stream WorkerConnectRequest) returns (stream WorkerConnectResponse) {}
+}
+
+// ----------------------------- Snapshot ----------------------------- //
+
+message Snapshot {
+  uint64 last_index = 1;
+  uint64 last_term = 2;
+  // Crutch: key in map cannot be msg type
+  repeated TaskID assigned_ids = 3;
+  repeated TaskWrapper assigned_tasks = 4;
+  repeated TaskID completed_ids = 5;
+  repeated TaskWrapper completed_tasks = 6;
+}
+
