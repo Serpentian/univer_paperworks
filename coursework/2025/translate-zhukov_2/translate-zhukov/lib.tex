@@ -1,0 +1,165 @@
+\captionsetup[figure]{
+    width=1.0\linewidth,
+    justification=justified,
+    font=small,
+    name=Рисунок,
+    labelsep=endash,
+    position=below,
+}
+
+\captionsetup[table]{
+    name=Таблица,
+    labelsep=endash, % Тире
+    position=above,
+    justification=justified,
+    singlelinecheck=false,
+    font=small,
+}
+
+\usepackage{amssymb}
+
+\usepackage[most]{tcolorbox}
+\usepackage{enumitem}
+\usepackage{amsmath,amssymb}
+
+% стиль бокса, похожий на книгу
+\tcbset{
+  experiment/.style={
+    colback=gray!5,
+    colframe=gray!40,
+    boxrule=0.4pt,
+    arc=1pt,
+    left=6pt,right=6pt,top=6pt,bottom=6pt,
+    enhanced,
+  }
+}
+
+\usepackage[most]{tcolorbox}
+\usepackage{amsmath,amssymb}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{varwidth}
+
+\definecolor{defblue}{RGB}{92,141,178}
+
+\newtcbtheorem[auto counter, number within=section]{mydefinition}{Определение}{%
+  enhanced,
+  colback=white,
+  colframe=defblue,
+  boxrule=0pt,
+  borderline west={1pt}{0pt}{defblue},
+  fonttitle=\bfseries,
+  coltitle=black,
+  attach boxed title to top left={yshift=-1.5mm,xshift=4mm},
+  boxed title style={empty,boxrule=0pt},
+  overlay unbroken={%
+    \node[fill=defblue,text=white,circle,inner sep=1.2pt]
+      at ([xshift=-6pt]frame.west|-title.north) {\bfseries D};
+  },
+}{def}
+
+
+\usepackage[most]{tcolorbox}
+\usepackage{xcolor}
+
+\definecolor{exblue}{RGB}{160,170,210} % мягкий сиренево-голубой как на скрине
+
+\newtcbtheorem[number within=section]{myexercise}{Упражнение}{%
+  enhanced,
+  colback=white,
+  colframe=exblue,
+  boxrule=0pt,
+  borderline west={2pt}{0pt}{exblue}, % вертикальная линия
+  sharp corners,
+  fonttitle=\bfseries\itshape,        % "Упражнение 7.1." курсив, как в книге
+  coltitle=black,
+  attach boxed title to top left={yshift=-1.5mm, xshift=4mm},
+  boxed title style={empty, boxrule=0pt},
+  overlay unbroken={%
+    \node[
+      fill=exblue,
+      text=white,
+      circle,
+      inner sep=1.2pt
+    ] at ([xshift=-6pt]frame.west|-title.north) {\bfseries E};
+  },
+}{ex}
+
+
+\definecolor{propurple}{RGB}{170,130,170} % цвет, как на скрине (фиолетовый)
+
+\newtcbtheorem[number within=section]{myproposition}{Утверждение}{%
+  enhanced,
+  colback=white,
+  colframe=propurple,
+  boxrule=0pt,
+  borderline west={2pt}{0pt}{propurple}, % вертикальная линия слева
+  sharp corners,
+  fonttitle=\bfseries,        % жирный заголовок
+  coltitle=black,
+  attach boxed title to top left={yshift=-1.5mm,xshift=4mm},
+  boxed title style={empty, boxrule=0pt},
+  overlay unbroken={%
+    \node[
+      fill=propurple,
+      text=white,
+      circle,
+      inner sep=1.2pt
+    ] at ([xshift=-6pt]frame.west|-title.north) {\bfseries P};
+  },
+}{prop}
+
+\definecolor{propurple}{RGB}{170,130,170} % цвет, как на скрине (фиолетовый)
+
+\newtcbtheorem[number within=section]{mylemma}{Лемма}{%
+  enhanced,
+  colback=white,
+  colframe=propurple,
+  boxrule=0pt,
+  borderline west={2pt}{0pt}{propurple}, % вертикальная линия слева
+  sharp corners,
+  fonttitle=\bfseries,        % жирный заголовок
+  coltitle=black,
+  attach boxed title to top left={yshift=-1.5mm,xshift=4mm},
+  boxed title style={empty, boxrule=0pt},
+  overlay unbroken={%
+    \node[
+      fill=propurple,
+      text=white,
+      circle,
+      inner sep=1.2pt
+    ] at ([xshift=-6pt]frame.west|-title.north) {\bfseries L};
+  },
+}{prop}
+
+\newtcbtheorem[number within=section]{mytheorem}{Теорема}{%
+  enhanced,
+  colback=white,
+  colframe=propurple,
+  boxrule=0pt,
+  borderline west={2pt}{0pt}{propurple}, % вертикальная линия слева
+  sharp corners,
+  fonttitle=\bfseries,        % жирный заголовок
+  coltitle=black,
+  attach boxed title to top left={yshift=-1.5mm,xshift=4mm},
+  boxed title style={empty, boxrule=0pt},
+  overlay unbroken={%
+    \node[
+      fill=propurple,
+      text=white,
+      circle,
+      inner sep=1.2pt
+    ] at ([xshift=-6pt]frame.west|-title.north) {\bfseries T};
+  },
+}{prop}
+
+\newenvironment{mylistingtext}[1]{
+    \begin{figure}[h!]
+    \centering
+    \begin{minipage}{0.95\linewidth}
+    \small               % уменьшенный шрифт
+    \textbf{Листинг #1}~–\;
+}{
+    \end{minipage}
+    \end{figure}
+}
