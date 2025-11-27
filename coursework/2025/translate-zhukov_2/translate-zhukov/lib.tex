@@ -52,6 +52,8 @@
   coltitle=black,
   attach boxed title to top left={yshift=-1.5mm,xshift=4mm},
   boxed title style={empty,boxrule=0pt},
+  frame code={} ,        % ещё один способ убрать рамку
+  interior titled code={},  % чтобы не рисовались внутренние псевдо-рамки
   overlay unbroken={%
     \node[fill=defblue,text=white,circle,inner sep=1.2pt]
       at ([xshift=-6pt]frame.west|-title.north) {\bfseries D};
@@ -75,6 +77,8 @@
   coltitle=black,
   attach boxed title to top left={yshift=-1.5mm, xshift=4mm},
   boxed title style={empty, boxrule=0pt},
+  frame code={} ,        % ещё один способ убрать рамку
+  interior titled code={},  % чтобы не рисовались внутренние псевдо-рамки
   overlay unbroken={%
     \node[
       fill=exblue,
@@ -99,6 +103,8 @@
   coltitle=black,
   attach boxed title to top left={yshift=-1.5mm,xshift=4mm},
   boxed title style={empty, boxrule=0pt},
+  frame code={} ,        % ещё один способ убрать рамку
+  interior titled code={},  % чтобы не рисовались внутренние псевдо-рамки
   overlay unbroken={%
     \node[
       fill=propurple,
@@ -122,6 +128,8 @@
   coltitle=black,
   attach boxed title to top left={yshift=-1.5mm,xshift=4mm},
   boxed title style={empty, boxrule=0pt},
+  frame code={} ,        % ещё один способ убрать рамку
+  interior titled code={},  % чтобы не рисовались внутренние псевдо-рамки
   overlay unbroken={%
     \node[
       fill=propurple,
@@ -143,6 +151,8 @@
   coltitle=black,
   attach boxed title to top left={yshift=-1.5mm,xshift=4mm},
   boxed title style={empty, boxrule=0pt},
+  frame code={} ,        % ещё один способ убрать рамку
+  interior titled code={},  % чтобы не рисовались внутренние псевдо-рамки
   overlay unbroken={%
     \node[
       fill=propurple,
@@ -153,8 +163,35 @@
   },
 }{prop}
 
+\definecolor{exyellow}{RGB}{223, 217, 170}
+
+\newtcbtheorem[number within=section]{myexample}{Пример}{%
+  enhanced,
+  colback=white,
+  colframe=exyellow,
+  boxrule=0pt,
+  borderline west={2pt}{0pt}{exyellow}, % вертикальная линия
+  leftrule=0pt, rightrule=0pt, toprule=0pt, bottomrule=0pt, % гарантия
+  sharp corners,
+  fonttitle=\bfseries\itshape,        % "Упражнение 7.1." курсив, как в книге
+  coltitle=black,
+  attach boxed title to top left={yshift=-1.5mm, xshift=4mm},
+  boxed title style={empty, boxrule=0pt},
+  frame code={} ,        % ещё один способ убрать рамку
+  interior titled code={},  % чтобы не рисовались внутренние псевдо-рамки
+  overlay unbroken={%
+    \node[
+      fill=exyellow,
+      text=white,
+      circle,
+      inner sep=1.2pt
+    ] at ([xshift=-6pt]frame.west|-title.north) {\bfseries E};
+  },
+}{ex}
+
 \newenvironment{mylistingtext}[1]{
     \begin{figure}[h!]
+    \vspace{-1em}
     \centering
     \begin{minipage}{0.95\linewidth}
     \small               % уменьшенный шрифт
