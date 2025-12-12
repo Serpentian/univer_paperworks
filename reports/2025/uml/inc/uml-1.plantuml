@@ -1,0 +1,127 @@
+@startuml LogManagementDomain
+
+' --- Классы (сущности) ---
+class Source {
+  + sourceId : UUID
+  + type : String
+  + name : String
+  + protocol : String
+  + generationRate : String
+}
+
+class Agent {
+  + agentId : UUID
+  + version : String
+  + supportedFormats : String
+  + transportMethod : String
+  + status : String
+}
+
+class LogEntry {
+  + entryId : UUID
+  + timestamp : DateTime
+  + sourceId : UUID
+  + eventType : String
+  + level : String
+  + message : String
+  + structuredFields : Map
+}
+
+class NormalizedEvent {
+  + normId : UUID
+  + normTimestamp : DateTime
+  + hostname : String
+  + eventType : String
+  + fields : Map
+  + completenessFlag : Boolean
+}
+
+class CorrelatedEvent {
+  + corrId : UUID
+  + ruleId : String
+  + scenario : String
+  + severity : String
+  + createdAt : DateTime
+}
+
+class Alert {
+  + alertId : UUID
+  + corrId : UUID
+  + severity : String
+  + status : String
+  + createdAt : DateTime
+}
+
+class Incident {
+  + incidentId : UUID
+  + title : String
+  + impact : String
+  + status : String
+  + openedAt : DateTime
+}
+
+class LogStorage {
+  + storageId : UUID
+  + capacity : String
+  + retentionPeriod : Duration
+  + encryptionEnabled : Boolean
+}
+
+class User {
+  + userId : UUID
+  + username : String
+  + role : String
+  + accessLevel : String
+}
+
+class Report {
+  + reportId : UUID
+  + type : String
+  + periodFrom : Date
+  + periodTo : Date
+  + authorId : UUID
+}
+
+' --- Связи и кардинальности ---
+Source "1" -- "0..*" Agent : deployed_on >
+Agent "0..*" -- "0..*" LogEntry : collects >
+Source "1" -- "0..*" LogEntry : generates >
+LogEntry "1" -- "1" NormalizedEvent : normalized_to >
+NormalizedEvent "0..*" -- "0..1" LogStorage : stored_in >
+CorrelatedEvent "1" -- "1..*" NormalizedEvent : aggregates >
+CorrelatedEvent "0..*" -- "0..*" LogStorage : indexed_in >
+CorrelatedEvent "0..*" -- "0..*" Alert : produces >
+Alert "0..*" -- "0..1" Incident : may_create >
+User "1" -- "0..*" Alert : acknowledges / handles >
+User "1" -- "0..*" Report : creates >
+Report "1" -- "0..*" LogStorage : queries_from >
+
+' --- Ограничения / заметки ---
+note top of LogEntry
+  Бизнес-правило:
+  все входящие записи должны иметь корректный timestamp,
+  синхронизированный по NTP.
+end note
+
+note top of NormalizedEvent
+  Бизнес-правило:
+  нормализация обязательна — каждое входящее событие
+  должно иметь соответствующее NormalizedEvent.
+end note
+
+note "Хранилище обеспечивает неизменность\nданных в течение срока ретенции" as N1
+LogStorage .. N1
+
+note right of CorrelatedEvent
+  Ограничение:
+  CorrelatedEvent содержит ссылки на все
+  исходные NormalizedEvent (traceability).
+end note
+
+note right of Agent
+  Ограничение:
+  Передача от агента должна быть защищена
+  (шифрование + аутентификация).
+end note
+
+@enduml

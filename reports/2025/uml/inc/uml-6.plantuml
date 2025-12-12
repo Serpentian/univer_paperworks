@@ -1,0 +1,25 @@
+@startuml
+actor Admin
+actor Auditor
+actor Workstation
+actor Agent
+actor UpdateServer
+actor SecuritySoftware
+
+usecase "Check Policy Compliance" as UC1
+usecase "Report Policy Violations" as UC2
+usecase "Update Policies" as UC3
+usecase "Install Updates" as UC4
+usecase "Verify Security Status" as UC5
+usecase "Generate Compliance Report" as UC6
+
+Admin --> UC1
+Admin --> UC2
+Admin --> UC3
+Auditor --> UC6
+Workstation --> UC1
+Agent --> UC1
+Agent --> UC2
+UpdateServer --> UC4
+SecuritySoftware --> UC5
+@enduml

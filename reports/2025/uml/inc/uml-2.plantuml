@@ -1,0 +1,43 @@
+@startuml UseCases_LogManagement
+
+actor "SOC / Analyst" as SOC
+actor "Administrator" as Admin
+actor "Auditor / Compliance" as Auditor
+actor "Source System" as Source
+actor "Security System" as SecSys
+actor "ITSM / SOAR" as ITSM
+actor "Regulator" as Reg
+
+usecase "Collect Logs" as UC1
+usecase "Normalize Events" as UC2
+usecase "Correlate Events" as UC3
+usecase "Generate Alerts" as UC4
+usecase "Manage Incidents" as UC5
+usecase "Visualize & Search Logs" as UC6
+usecase "Generate Reports" as UC7
+usecase "Acknowledge Alerts" as UC8
+usecase "Provide Compliance Data" as UC9
+
+' --- связи акторов и прецедентов ---
+Source --> UC1
+SecSys --> UC1
+UC1 --> UC2
+UC2 --> UC3
+UC3 --> UC4
+UC4 --> UC5
+SOC --> UC6
+SOC --> UC8
+Admin --> UC1
+Admin --> UC2
+Admin --> UC3
+Admin --> UC4
+Admin --> UC5
+Admin --> UC6
+Admin --> UC7
+Auditor --> UC7
+Reg --> UC9
+ITSM --> UC5
+UC4 --> ITSM : triggers
+UC5 --> ITSM : updates
+
+@enduml

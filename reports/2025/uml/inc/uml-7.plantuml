@@ -1,0 +1,16 @@
+@startuml
+start
+:Agent checks policy compliance;
+if (Violation detected?) then (yes)
+  :Report violation to console;
+  :Admin reviews violation;
+  if (Critical?) then (yes)
+    :Immediate remediation;
+  else (no)
+    :Log for reporting;
+  endif
+else (no)
+  :Continue monitoring;
+endif
+stop
+@enduml

@@ -1,0 +1,14 @@
+@startuml State_Incident
+
+[*] --> New
+
+New --> Assigned : Analyst Assigned
+Assigned --> InProgress : Investigation Started
+InProgress --> OnHold : Pending Info / Escalation
+InProgress --> Resolved : Issue Solved
+OnHold --> InProgress : Resume Work
+Resolved --> Closed : Verified & Closed
+Resolved --> Reopened : Issue Recurs
+Reopened --> InProgress : Reinvestigate
+
+@enduml

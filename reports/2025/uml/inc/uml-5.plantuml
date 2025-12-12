@@ -1,0 +1,52 @@
+@startuml
+class Workstation {
+    +id: String
+    +complianceStatus: String
+    +installedSoftware: String
+    +securityConfig: String
+}
+
+class Policy {
+    +id: String
+    +type: String
+    +requirements: String
+    +priority: String
+}
+
+class Agent {
+    +version: String
+    +status: String
+    +scanFrequency: String
+    +scanResults: String
+}
+
+class Violation {
+    +id: String
+    +type: String
+    +severity: String
+    +timestamp: DateTime
+}
+
+class Admin {
+    +id: String
+    +role: String
+    +accessLevel: String
+}
+
+class Report {
+    +id: String
+    +period: String
+    +includedViolations: String
+    +responsibleAdmin: String
+    +format: String
+}
+
+Workstation "1" -- "1..1" Agent : has >
+Agent "1" -- "*" Policy : enforces >
+Workstation "1" -- "*" Violation : may generate >
+Agent "1" -- "*" Violation : detects >
+Admin "1" -- "*" Policy : manages >
+Admin "1" -- "*" Report : generates >
+Report "*" -- "*" Violation : summarizes >
+Policy "1" -- "*" Violation : can trigger >
+@enduml

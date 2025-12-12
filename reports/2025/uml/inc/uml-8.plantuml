@@ -1,0 +1,9 @@
+@startuml
+[*] --> Detected
+Detected --> Reviewed : Admin reviews
+Reviewed --> Remediation : Critical violation
+Reviewed --> Logged : Non-critical violation
+Remediation --> Closed : Issue resolved
+Logged --> Closed : Periodic review
+Closed --> [*]
+@enduml

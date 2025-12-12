@@ -1,0 +1,24 @@
+@startuml Activity_LogIncident
+
+start
+:Receive Normalized Event;
+:Check Correlation Rules;
+if (Matches Rule?) then (yes)
+  :Create Correlated Event;
+  :Generate Alert;
+  :Notify SOC;
+  :SOC Acknowledges Alert;
+  :Evaluate Incident Severity;
+  if (Incident Required?) then (yes)
+    :Create Incident in ITSM;
+    :Assign Incident to Analyst;
+    :Investigate and Update Status;
+  else (no)
+    :Log as Informational;
+  endif
+else (no)
+  :Store Event for Future Analysis;
+endif
+stop
+
+@enduml
