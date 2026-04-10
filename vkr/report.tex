@@ -1,0 +1,60 @@
+\documentclass[diploma]{BMSTU-IU8}
+
+\usepackage{amssymb} % triangleeq
+\usepackage{pdfpages}
+
+% \include{contents/glossary}
+% \include{contents/terms}
+
+\addbibresource{report.bib}
+
+\begin{document}
+    \includepdf[pages=-]{inc/titul.pdf} % Титульник
+    \includepdf[pages=-]{inc/iz_kp.pdf} % Задание
+    \setcounter{page}{6} % Устанавливает счётчик страниц
+
+    \include{contents/0-abstract} % Реферат
+
+    \tableofcontents % Содержание
+    % \termsanddefenitions % Термины и определения
+    % \listofabbreviations % Перечень сокращений и обозначений
+
+    % ВВЕДЕНИЕ
+    \include{contents/1-introduction}
+
+    % ИССЛЕДОВАТЕЛЬСКАЯ ЧАСТЬ
+    \include{contents/2-research/0-abstract}
+    \include{contents/2-research/1-distributed-systems}
+    \include{contents/2-research/2-consensus}
+    \include{contents/2-research/3-validation}
+    \include{contents/2-research/4-math}
+
+    % КОНСТРУКТОРСКАЯ ЧАСТЬ
+    \include{contents/3-design/0-abstract}
+
+    % ТЕХНОЛОГИЧЕСКАЯ ЧАСТЬ
+    \include{contents/4-tech/0-abstract}
+
+    % ОРГАНИЗАЦИОННО-ЭКОНОМИЧЕСКАЯ ЧАСТЬ
+    \include{contents/5-economics/0-abstract}
+    \include{contents/5-economics/1-labor-price}
+    \include{contents/5-economics/2-diagrams}
+    \include{contents/5-economics/3-money}
+    \include{contents/5-economics/4-competitors}
+    \include{contents/5-economics/5-price}
+    \include{contents/5-economics/6-innovation}
+    \include{contents/5-economics/7-conclusion}
+
+    % ОРГАНИЗАЦИОННО-ПРАВОВАЯ ЧАСТЬ
+    \include{contents/6-law/0-abstract}
+    \include{contents/6-law/1-law}
+    \include{contents/6-law/2-conclusion}
+
+    \include{contents/7-conclusion}
+
+    \printbibliography
+
+    \appendix
+    % \include{contents/4-appendix-a}
+    % \include{contents/4-appendix-b}
+\end{document}
