@@ -1,7 +1,8 @@
 \documentclass[diploma]{BMSTU-IU8}
 
+\usepackage{pdfpages} %
 \usepackage{amssymb} % triangleeq
-\usepackage{pdfpages}
+\newtheorem{proposition}{Утверждение}
 
 % \include{contents/glossary}
 % \include{contents/terms}
@@ -24,16 +25,23 @@
 
     % ИССЛЕДОВАТЕЛЬСКАЯ ЧАСТЬ
     \include{contents/2-research/0-abstract}
-    \include{contents/2-research/1-distributed-systems}
+    \include{contents/2-research/1-distributed}
     \include{contents/2-research/2-consensus}
     \include{contents/2-research/3-validation}
     \include{contents/2-research/4-math}
 
     % КОНСТРУКТОРСКАЯ ЧАСТЬ
     \include{contents/3-design/0-abstract}
+    \include{contents/3-design/1-distributed}
+    \include{contents/3-design/2-validation}
+    \include{contents/3-design/3-math-sol}
 
     % ТЕХНОЛОГИЧЕСКАЯ ЧАСТЬ
     \include{contents/4-tech/0-abstract}
+    \include{contents/4-tech/1-spec}
+    \include{contents/4-tech/2-distributed}
+    \include{contents/4-tech/3-validation}
+    \include{contents/4-tech/4-integration}
 
     % ОРГАНИЗАЦИОННО-ЭКОНОМИЧЕСКАЯ ЧАСТЬ
     \include{contents/5-economics/0-abstract}
@@ -55,6 +63,5 @@
     \printbibliography
 
     \appendix
-    % \include{contents/4-appendix-a}
-    % \include{contents/4-appendix-b}
+    \include{contents/8-appendix-a}
 \end{document}
