@@ -4,9 +4,7 @@
 \usepackage{amssymb} % triangleeq
 \newtheorem{proposition}{Утверждение}
 
-% \include{contents/glossary}
-% \include{contents/terms}
-
+\include{contents/glossary}
 \addbibresource{report.bib}
 
 \begin{document}
@@ -16,9 +14,8 @@
 
     \include{contents/0-abstract} % Реферат
 
+    \listofabbreviations % Перечень сокращений и обозначений
     \tableofcontents % Содержание
-    % \termsanddefenitions % Термины и определения
-    % \listofabbreviations % Перечень сокращений и обозначений
 
     % ВВЕДЕНИЕ
     \include{contents/1-introduction}
@@ -38,8 +35,8 @@
 
     % ТЕХНОЛОГИЧЕСКАЯ ЧАСТЬ
     \include{contents/4-tech/0-abstract}
-    \include{contents/4-tech/1-spec}
     \include{contents/4-tech/2-distributed}
+    \include{contents/4-tech/1-spec}
     \include{contents/4-tech/3-validation}
     \include{contents/4-tech/4-integration}
 
